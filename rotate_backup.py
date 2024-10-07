@@ -4,6 +4,8 @@ import glob
 import os
 import shutil
 
+# VERSION v1.00
+
 # keep minimum days = 7
 # keep minimum weeks = 4
 

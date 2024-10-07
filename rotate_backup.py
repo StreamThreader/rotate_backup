@@ -3,15 +3,17 @@
 import glob
 import os
 import shutil
+from datetime import datetime
 
-# VERSION v1.00
+# VERSION v2.00
 
 # keep minimum days = 7
 # keep minimum weeks = 4
 
 KEEP_DAYS = 180
 KEEP_WEEKS = 48
-rotate_dir = "~/dev/test_place/"
+rotate_dir = "/home/sthreader/dev/rotate_backup/test_dir/"
+log_file = rotate_dir+"logfile.log"
 name_pattern = "????-??-??-v8.3-TW-ERP--??-??-"
 daily_suffix = "d.dt"
 weekly_suffix = "w.dt"
@@ -29,25 +31,40 @@ start_from_scratch = 0
 if not os.path.exists(rotate_dir):
     exit(1)
 
+def logwriter(message_text):
+    now = datetime.now()
+    dt_string = now.strftime("%Y-%m-%d-%H:%M:%S")
+    with open("log_file", "a") as logfile:
+        logfile.write(dt_string+" "+message_text+"\n")
+
+
+logwriter("######################### [new rotate] ############################")
+
 #################### get list #################################################
 
-# get list of all daily dt files
+# list daily
 for dt_file in glob.glob(rotate_dir+name_pattern+daily_suffix):
     all_daily_files.append(dt_file)
 all_daily_files.sort(reverse=True)
 all_daily_countmax=len(all_daily_files)
 
-# get list of weekly dt files
+logwriter("daily backup files (include duplicates): "+str(all_daily_countmax))
+
+# list weekly
 for dt_file in glob.glob(rotate_dir+name_pattern+weekly_suffix):
     weekly_files.append(dt_file)
 weekly_files.sort(reverse=True)
 weekly_countmax=len(weekly_files)
 
-# get list of monts dt files
+logwriter("weekly backup files: "+str(weekly_countmax))
+
+# list montly
 for dt_file in glob.glob(rotate_dir+name_pattern+montly_suffix):
     montly_files.append(dt_file)
 montly_files.sort(reverse=True)
 montly_countmax=len(montly_files)
+
+logwriter("montly backup files: "+str(montly_countmax))
 
 # create list only for daily files
 # exclude multiple backup per day
@@ -80,7 +97,7 @@ for dt_file in all_daily_files:
     date_position +=1
 
 only_daily_countmax=len(only_daily_files)
-
+logwriter("daily backup files: "+str(all_daily_countmax))
 
 #################### create weeks #############################################
 
@@ -111,6 +128,8 @@ if weekly_countmax:
                     # add new week to list
                     weekly_files.insert(0, tmp_week_cp_dtfile)
                     weekly_countmax=len(weekly_files)
+
+                    logwriter("normal create weekly file: "+tmp_week_cp_dtfile)
 
                     if tmp_counter > 7:
                         tmp_counter -= 7
@@ -148,6 +167,8 @@ if start_from_scratch == 1 or weekly_countmax == 0:
                 weekly_suffix)
             os.link(tmp_week_dtfile, tmp_week_cp_dtfile)
 
+            logwriter("create weekly file from last daily file: "+tmp_week_cp_dtfile)
+
             # add new week to list
             weekly_files.insert(0, tmp_week_cp_dtfile)
             weekly_countmax=len(weekly_files)
@@ -183,6 +204,8 @@ if montly_countmax:
                             montly_suffix)
                     os.link(tmp_montly_dtfile, \
                         tmp_montly_cp_dtfile)
+
+                    logwriter("create montly file: "+tmp_montly_cp_dtfile)
 
                     # add new mont to list
                     montly_files.insert(0, tmp_montly_cp_dtfile)
@@ -223,6 +246,8 @@ if start_from_scratch == 1 or montly_countmax == 0:
 
             os.link(tmp_montly_dtfile, tmp_montly_cp_dtfile)
 
+            logwriter("create montly file from latest: "+tmp_montly_cp_dtfile)
+
             # add new mont to list
             montly_files.insert(0, tmp_montly_cp_dtfile)
 
@@ -257,6 +282,7 @@ if KEEP_DAYS < only_daily_countmax:
                             # if we found date for exlude
                             # remove it from array
                             all_daily_files.remove(dt_file)
+                            
                             # break because we shift list
                             # for restart loop
                             break
@@ -269,6 +295,7 @@ if KEEP_DAYS < only_daily_countmax:
     # loop trought remain list after exclude
     for dt_file in all_daily_files:
         os.remove(dt_file)
+        logwriter("remove daily file: "+dt_file)
 
 
 #################### rotate weeks #############################################
@@ -284,4 +311,4 @@ if KEEP_WEEKS < weekly_countmax:
     # delete over limit weeks
     for dt_file in weekly_files:
         os.remove(dt_file)
-
+        logwriter("remove weekly file: "+dt_file)

@@ -10,9 +10,9 @@ fi
 cd "$TARGETDIR"
 
 # clear test_dir
-for file in $(ls 1 "$TARGETDIR/"); do
-    rm "$TARGETDIR/$file"
-done
+#for file in $(ls 1 "$TARGETDIR/"); do
+#    rm "$TARGETDIR/$file"
+#done
 
 # fill test_dir
 for year in 2024; do

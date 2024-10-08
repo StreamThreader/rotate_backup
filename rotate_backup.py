@@ -10,8 +10,8 @@ from datetime import datetime
 # keep minimum days = 7
 # keep minimum weeks = 4
 
-KEEP_DAYS = 180
-KEEP_WEEKS = 48
+KEEP_DAYS = 31
+KEEP_WEEKS = 4
 rotate_dir = "/home/sthreader/dev/rotate_backup/test_dir/"
 log_file = rotate_dir+"logfile.log"
 name_pattern = "????-??-??-v8.3-TW-ERP--??-??-"
@@ -34,7 +34,7 @@ if not os.path.exists(rotate_dir):
 def logwriter(message_text):
     now = datetime.now()
     dt_string = now.strftime("%Y-%m-%d-%H:%M:%S")
-    with open("log_file", "a") as logfile:
+    with open(log_file, "a") as logfile:
         logfile.write(dt_string+" "+message_text+"\n")
 
 
@@ -48,7 +48,7 @@ for dt_file in glob.glob(rotate_dir+name_pattern+daily_suffix):
 all_daily_files.sort(reverse=True)
 all_daily_countmax=len(all_daily_files)
 
-logwriter("daily backup files (include duplicates): "+str(all_daily_countmax))
+logwriter("daily backup files: "+str(all_daily_countmax))
 
 # list weekly
 for dt_file in glob.glob(rotate_dir+name_pattern+weekly_suffix):
@@ -97,25 +97,28 @@ for dt_file in all_daily_files:
     date_position +=1
 
 only_daily_countmax=len(only_daily_files)
-logwriter("daily backup files: "+str(all_daily_countmax))
+logwriter("daily backup dates: "+str(all_daily_countmax))
 
 #################### create weeks #############################################
 
-# create weeks files (from latest days or exist week)
 if weekly_countmax:
-    # if weeks file exist
-    # get latest week date
-
-    # search daily file from what created latest weeks file
+    # search daily file from latest weekly file
     search_daily_file = weekly_files[0].replace(weekly_suffix, daily_suffix)
     tmp_index = 0
     start_from_scratch = 0
 
+    logwriter("latest week file: "+weekly_files[0])
+    logwriter("searching day file: "+search_daily_file)
+
     while tmp_index < only_daily_countmax:
         # if we found daily file from week
         if only_daily_files[tmp_index] == search_daily_file:
+            logwriter("founded daily file: "+only_daily_files[tmp_index])
             if tmp_index > 6:
+                logwriter("days count: "+str(tmp_index))
                 how_many_weeks = tmp_index // 7
+                logwriter("how many weeks can be created from daily files: "+\
+                    str(how_many_weeks))
                 # copy every 7 daily file as weeks
                 # starting from latest week
                 tmp_counter = tmp_index - 7
@@ -145,18 +148,21 @@ if weekly_countmax:
         # init recreate weekly file
         if tmp_index == only_daily_countmax:
             start_from_scratch = 1
+            logwriter("not found daily file for latest week")
 
 # if we not found any weekly file
 # or we can not find daily file for latest week
 if start_from_scratch == 1 or weekly_countmax == 0:
     if only_daily_countmax > 6:
-
         if start_from_scratch == 0:
             # how many weeks from daily list we can get
             how_many_weeks = only_daily_countmax // 7
+            logwriter("how many weeks can be created from daily files: "+\
+                str(how_many_weeks))
         else:
             # get only 1 week from latest day
             how_many_weeks = 1
+            logwriter("we start from scratch, and create only 1 weekly file")
 
         # copy every 7 daily file as weeks
         # starting from latest daily file
@@ -167,10 +173,11 @@ if start_from_scratch == 1 or weekly_countmax == 0:
                 weekly_suffix)
             os.link(tmp_week_dtfile, tmp_week_cp_dtfile)
 
-            logwriter("create weekly file from last daily file: "+tmp_week_cp_dtfile)
+            logwriter("create weekly file from last daily file: "\
+                +tmp_week_cp_dtfile)
 
             # add new week to list
-            weekly_files.insert(0, tmp_week_cp_dtfile)
+            weekly_files.append(tmp_week_cp_dtfile)
             weekly_countmax=len(weekly_files)
 
             tmp_counter += 7
@@ -181,7 +188,7 @@ if start_from_scratch == 1 or weekly_countmax == 0:
 # create monts files (from latest weeks or exist monts)
 if montly_countmax:
     # if monts file exist
-    # get latest mont date
+    # get latest month date
 
     # search weekly file from what created latest monts file
     search_weekly_file = montly_files[0].replace(montly_suffix, weekly_suffix)
@@ -282,7 +289,8 @@ if KEEP_DAYS < only_daily_countmax:
                             # if we found date for exlude
                             # remove it from array
                             all_daily_files.remove(dt_file)
-                            
+                            logwriter("keep daily file: "+dt_file)
+
                             # break because we shift list
                             # for restart loop
                             break
@@ -302,9 +310,12 @@ if KEEP_DAYS < only_daily_countmax:
 
 # if weekly files more than limit
 if KEEP_WEEKS < weekly_countmax:
+    logwriter("start delete weeks")
+
     tmp_counter = 0
     # exclude keep weeks
     while KEEP_WEEKS > tmp_counter:
+        logwriter("keep weekly file: "+weekly_files[0])
         del weekly_files[0]
         tmp_counter += 1
 

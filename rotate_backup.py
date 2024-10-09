@@ -7,9 +7,6 @@ from datetime import datetime
 
 # VERSION v2.00
 
-# keep minimum days = 7
-# keep minimum weeks = 4
-
 KEEP_DAYS = 31
 KEEP_WEEKS = 4
 rotate_dir = "/home/sthreader/dev/rotate_backup/test_dir/"
@@ -29,6 +26,7 @@ latest_week = []
 start_from_scratch = 0
 
 if not os.path.exists(rotate_dir):
+    print("directory not exist: "+rotate_dir)
     exit(1)
 
 def logwriter(message_text):
@@ -37,8 +35,16 @@ def logwriter(message_text):
     with open(log_file, "a") as logfile:
         logfile.write(dt_string+" "+message_text+"\n")
 
-
 logwriter("######################### [new rotate] ############################")
+
+if KEEP_DAYS < 7:
+    logwriter("keep days value lower than 7")
+    exit(1)
+
+if KEEP_WEEKS < 4:
+    logwriter("keep weeks value lower than 4")
+    exit(1)
+
 
 #################### get list #################################################
 

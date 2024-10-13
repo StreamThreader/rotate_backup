@@ -5,7 +5,7 @@ import os
 import shutil
 from datetime import datetime
 
-# VERSION v2.00
+# VERSION v2.01
 
 KEEP_DAYS = 31
 KEEP_WEEKS = 4
@@ -24,6 +24,8 @@ how_many_weeks = 0
 how_many_monts = 0
 latest_week = []
 start_from_scratch = 0
+dir_size = 0
+dir_free = 0
 
 if not os.path.exists(rotate_dir):
     print("directory not exist: "+rotate_dir)
@@ -45,13 +47,29 @@ if KEEP_WEEKS < 4:
     logwriter("keep weeks value lower than 4")
     exit(1)
 
+logwriter("rotate dir: "+rotate_dir)
+
+# calculate dir size
+for path, dirs, files in os.walk(rotate_dir):
+    for f in files:
+        fp = os.path.join(path, f)
+        dir_size += os.path.getsize(fp)
+
+logwriter("used: "+str(dir_size)+" bytes")
+
+# calculate free space
+statvfs = os.statvfs(rotate_dir)
+dir_free = statvfs.f_frsize * statvfs.f_blocks
+
+logwriter("free: "+str(dir_free)+" bytes")
 
 #################### get list #################################################
 
 # list daily
 for dt_file in glob.glob(rotate_dir+name_pattern+daily_suffix):
     all_daily_files.append(dt_file)
-all_daily_files.sort(reverse=True)
+#all_daily_files.sort(reverse=True)
+all_daily_files.sort()
 all_daily_countmax=len(all_daily_files)
 
 logwriter("daily backup files: "+str(all_daily_countmax))

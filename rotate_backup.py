@@ -39,14 +39,6 @@ def logwriter(message_text):
 
 logwriter("######################### [new rotate] ############################")
 
-if KEEP_DAYS < 7:
-    logwriter("keep days value lower than 7")
-    exit(1)
-
-if KEEP_WEEKS < 4:
-    logwriter("keep weeks value lower than 4")
-    exit(1)
-
 logwriter("rotate dir: "+rotate_dir)
 
 # calculate dir size
@@ -72,7 +64,7 @@ for dt_file in glob.glob(rotate_dir+name_pattern+daily_suffix):
 all_daily_files.sort()
 all_daily_countmax=len(all_daily_files)
 
-logwriter("daily backup files: "+str(all_daily_countmax))
+logwriter("all daily backup files: "+str(all_daily_countmax))
 
 # list weekly
 for dt_file in glob.glob(rotate_dir+name_pattern+weekly_suffix):
@@ -121,7 +113,7 @@ for dt_file in all_daily_files:
     date_position +=1
 
 only_daily_countmax=len(only_daily_files)
-logwriter("daily backup dates: "+str(all_daily_countmax))
+logwriter("daily backup files: "+str(all_daily_countmax))
 
 #################### create weeks #############################################
 

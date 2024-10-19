@@ -16,6 +16,8 @@ daily_suffix = "d.dt"
 weekly_suffix = "w.dt"
 montly_suffix = "m.dt"
 all_daily_files = []
+daily_array = {}
+weekly_array = {}
 only_daily_files = []
 weekly_files = []
 montly_files = []
@@ -36,6 +38,20 @@ def logwriter(message_text):
     dt_string = now.strftime("%Y-%m-%d-%H:%M:%S")
     with open(log_file, "a") as logfile:
         logfile.write(dt_string+" "+message_text+"\n")
+
+def make_link(src_file, dst_file):
+    if not os.path.exists(src_file):
+        logwriter("file not exist: "+src_file)
+        return 0
+
+    if os.path.exists(dst_file):
+        return 1
+    else:
+        # create symlink
+        os.link(src_file, dst_file)
+        logwriter("file created: "+dst_file)
+        return 1
+
 
 logwriter("######################### [new rotate] ############################")
 
@@ -60,16 +76,15 @@ logwriter("free: "+str(dir_free)+" bytes")
 # list daily
 for dt_file in glob.glob(rotate_dir+name_pattern+daily_suffix):
     all_daily_files.append(dt_file)
-#all_daily_files.sort(reverse=True)
 all_daily_files.sort()
 all_daily_countmax=len(all_daily_files)
 
-logwriter("all daily backup files: "+str(all_daily_countmax))
+logwriter("daily backup files: "+str(all_daily_countmax))
 
 # list weekly
 for dt_file in glob.glob(rotate_dir+name_pattern+weekly_suffix):
     weekly_files.append(dt_file)
-weekly_files.sort(reverse=True)
+weekly_files.sort()
 weekly_countmax=len(weekly_files)
 
 logwriter("weekly backup files: "+str(weekly_countmax))
@@ -82,202 +97,129 @@ montly_countmax=len(montly_files)
 
 logwriter("montly backup files: "+str(montly_countmax))
 
-# create list only for daily files
-# exclude multiple backup per day
-date_position = 0
-tmp_var = [0,0,0]
-for dt_file in all_daily_files:
-    tmp_dateday = dt_file.split("/")[-1]
-    tmp_dateday = tmp_dateday.split("-")
+# parse first-last years
+first_day_file = all_daily_files[0].split("/")[-1].split("-")
+last_day_file = all_daily_files[-1].split("/")[-1].split("-")
+first_year = int(first_day_file[0])
+last_year = int(last_day_file[0])
 
-    # year comparsion
-    if tmp_var[0] == tmp_dateday[0]:
-        # month comparsion
-        if tmp_var[1] == tmp_dateday[1]:
-            # day comparsion
-            if tmp_var[2] == tmp_dateday[2]:
-                continue
+# generate at least one year (not empty)
+year_range = list(range(first_year, last_year+1))
 
-    # if not duplicate, write to array
-    only_daily_files.append(dt_file)
-
-    # remember previous date
-    tmp_var[0] = tmp_dateday[0]
-    tmp_var[1] = tmp_dateday[1]
-    tmp_var[2] = tmp_dateday[2]
-
-    keep_date_days[date_position] = {}
-    keep_date_days[date_position]["year"] = tmp_var[0]
-    keep_date_days[date_position]["mont"] = tmp_var[1]
-    keep_date_days[date_position]["day"] = tmp_var[2]
-    date_position +=1
-
-only_daily_countmax=len(only_daily_files)
-logwriter("daily backup files: "+str(all_daily_countmax))
 
 #################### create weeks #############################################
 
-if weekly_countmax:
-    # search daily file from latest weekly file
-    search_daily_file = weekly_files[0].replace(weekly_suffix, daily_suffix)
-    tmp_index = 0
-    start_from_scratch = 0
+# generate empty daily list
+for gen_year in year_range:
+    gen_year = str(gen_year)
+    # init new year
+    daily_array.update({gen_year: []})
+    for gen_month in range(1,13):
+        # init new month
+        daily_array[gen_year].append([])
+        for gen_day in range(1,32):
+            # init list of files by day
+            daily_array[str(gen_year)][-1].append([])
+            # init empty day first file path
+            daily_array[str(gen_year)][-1][-1].append("empty")
 
-    logwriter("latest week file: "+weekly_files[0])
-    logwriter("searching day file: "+search_daily_file)
+# fill daily list by files
+for dt_file in all_daily_files:
+    dt_dateday = dt_file.split("/")[-1]
+    dt_dateday = dt_dateday.split("-")
 
-    while tmp_index < only_daily_countmax:
-        # if we found daily file from week
-        if only_daily_files[tmp_index] == search_daily_file:
-            logwriter("founded daily file: "+only_daily_files[tmp_index])
-            if tmp_index > 6:
-                logwriter("days count: "+str(tmp_index))
-                how_many_weeks = tmp_index // 7
-                logwriter("how many weeks can be created from daily files: "+\
-                    str(how_many_weeks))
-                # copy every 7 daily file as weeks
-                # starting from latest week
-                tmp_counter = tmp_index - 7
-                while how_many_weeks:
-                    tmp_week_dtfile = only_daily_files[tmp_counter]
-                    tmp_week_cp_dtfile = tmp_week_dtfile.replace(daily_suffix,\
-                        weekly_suffix)
-                    os.link(tmp_week_dtfile, tmp_week_cp_dtfile)
+    dt_year = int(dt_dateday[0])
+    dt_month = int(dt_dateday[1])
+    dt_day = int(dt_dateday[2])
 
-                    # add new week to list
-                    weekly_files.insert(0, tmp_week_cp_dtfile)
-                    weekly_countmax=len(weekly_files)
+    # remove empty value for this day
+    if daily_array[str(dt_year)][dt_month-1][dt_day-1][0] == "empty":
+        daily_array[str(dt_year)][dt_month-1][dt_day-1].remove("empty")
 
-                    logwriter("normal create weekly file: "+tmp_week_cp_dtfile)
+    # append daily file path to list
+    daily_array[str(dt_year)][dt_month-1][dt_day-1].append(dt_file)
 
-                    if tmp_counter > 7:
-                        tmp_counter -= 7
-                    how_many_weeks -= 1
 
-            # if we found, break
-            break
+for week_year in daily_array:
+    for week_month in range(0,12):
+        for week_day in 1, 8, 15, 22, 29:
+            # get only first file from day
+            daily_file = daily_array[week_year][week_month][week_day-1][0]
+            # convert dailly file name to weekly
+            week_new_file = daily_file.replace(daily_suffix, weekly_suffix)
 
-        # otherwise continue searching
-        tmp_index += 1
+            # try create new weekly file
+            if make_link(daily_file, week_new_file):
+                # add to week list
+                if not week_new_file in weekly_files:
+                    weekly_files.add(week_new_file)
+                    weekly_files.sort()
+                continue
+            else:
+                # try to search alternative daily files
+                if week_day == 1:
+                    alt_week_day = 2
+                else:
+                    alt_week_day = week_day-6
 
-        # we reach end of list, and not found daily file
-        # init recreate weekly file
-        if tmp_index == only_daily_countmax:
-            start_from_scratch = 1
-            logwriter("not found daily file for latest week")
+                # rewind backward, and try find file
+                for alt_day in range(alt_week_day, (alt_week_day+6)):
+                    daily_file = daily_array[week_year][week_month][alt_day-1][0]
+                    week_new_file = daily_file.replace(daily_suffix, weekly_suffix)
 
-# if we not found any weekly file
-# or we can not find daily file for latest week
-if start_from_scratch == 1 or weekly_countmax == 0:
-    if only_daily_countmax > 6:
-        if start_from_scratch == 0:
-            # how many weeks from daily list we can get
-            how_many_weeks = only_daily_countmax // 7
-            logwriter("how many weeks can be created from daily files: "+\
-                str(how_many_weeks))
-        else:
-            # get only 1 week from latest day
-            how_many_weeks = 1
-            logwriter("we start from scratch, and create only 1 weekly file")
+                    if daily_file == "empty":
+                        continue
 
-        # copy every 7 daily file as weeks
-        # starting from latest daily file
-        tmp_counter = 6
-        while how_many_weeks:
-            tmp_week_dtfile = only_daily_files[tmp_counter]
-            tmp_week_cp_dtfile = tmp_week_dtfile.replace(daily_suffix,\
-                weekly_suffix)
-            os.link(tmp_week_dtfile, tmp_week_cp_dtfile)
+                    # if alternative file created, break
+                    if make_link(daily_file, week_new_file):
+                        # add to week list
+                        if not week_new_file in weekly_files:
+                            weekly_files.add(week_new_file)
+                            weekly_files.sort()
+                        break
 
-            logwriter("create weekly file from last daily file: "\
-                +tmp_week_cp_dtfile)
-
-            # add new week to list
-            weekly_files.append(tmp_week_cp_dtfile)
-            weekly_countmax=len(weekly_files)
-
-            tmp_counter += 7
-            how_many_weeks -= 1
 
 #################### create monts #############################################
 
-# create monts files (from latest weeks or exist monts)
-if montly_countmax:
-    # if monts file exist
-    # get latest month date
+# generate empty weekly list
+for gen_year in year_range:
+    gen_year = str(gen_year)
+    # init new year
+    weekly_array.update({gen_year: []})
+    for gen_month in range(1,13):
+        # init list of files by weeks
+        weekly_array[str(gen_year)].append([])
 
-    # search weekly file from what created latest monts file
-    search_weekly_file = montly_files[0].replace(montly_suffix, weekly_suffix)
-    tmp_index = 0
-    start_from_scratch = 0
+# fill weekly list by files
+for dt_file in weekly_files:
+    dt_dateday = dt_file.split("/")[-1]
+    dt_dateday = dt_dateday.split("-")
 
-    while tmp_index < weekly_countmax:
-        # if we found weekly file from montly
-        if weekly_files[tmp_index] == search_weekly_file:
-            if tmp_index > 3:
-                how_many_monts = tmp_index // 4
+    dt_year = int(dt_dateday[0])
+    dt_month = int(dt_dateday[1])
+    dt_day = int(dt_dateday[2])
 
-                # copy every 4 weekly file as monts
-                # starting from latest monts
-                tmp_counter = tmp_index - 4
-                while how_many_monts:
-                    tmp_montly_dtfile = weekly_files[tmp_counter]
-                    tmp_montly_cp_dtfile = \
-                        tmp_montly_dtfile.replace(weekly_suffix, \
-                            montly_suffix)
-                    os.link(tmp_montly_dtfile, \
-                        tmp_montly_cp_dtfile)
+    # append weekly file path to list
+    weekly_array[str(dt_year)][dt_month-1].append(dt_file)
 
-                    logwriter("create montly file: "+tmp_montly_cp_dtfile)
+# create month file
+for month_year in weekly_array:
+    for month_month in range(0,12):
+        for weekly_file in weekly_array[str(month_year)][month_month]:
+            if weekly_file == "":
+                continue
 
-                    # add new mont to list
-                    montly_files.insert(0, tmp_montly_cp_dtfile)
+            # convert weekly file name to montly
+            month_new_file = weekly_file.replace(weekly_suffix, montly_suffix)
 
-                    if tmp_counter > 4:
-                        tmp_counter -= 4
-                    how_many_monts -= 1
+            if make_link(weekly_file, month_new_file):
+                # add to month list
+                if not week_new_file in weekly_files:
+                    montly_files.add(week_new_file)
+                    montly_files.sort()
+                break
 
-            # if we found, break
-            break
-
-        # otherwise continue searching
-        tmp_index += 1
-
-        # we reach end of list, and not found weekly file
-        # init recreate montly file
-        if tmp_index == weekly_countmax:
-            start_from_scratch = 1
-
-# if we not found any monts file
-# or we can not find weekly file for latest monts
-if start_from_scratch == 1 or montly_countmax == 0:
-    if weekly_countmax > 3:
-        if start_from_scratch == 0:
-            # how many monts from weekly list we can get
-            how_many_monts = weekly_countmax // 4
-        else:
-            # get only 1 monts from latest week
-            how_many_monts = 1
-
-        # copy every 4 weekly file as monts
-        # limited by how_many_monts variable
-        tmp_counter = 3
-        while how_many_monts:
-            tmp_montly_dtfile = weekly_files[tmp_counter]
-            tmp_montly_cp_dtfile = \
-                tmp_montly_dtfile.replace(weekly_suffix, montly_suffix)
-
-            os.link(tmp_montly_dtfile, tmp_montly_cp_dtfile)
-
-            logwriter("create montly file from latest: "+tmp_montly_cp_dtfile)
-
-            # add new mont to list
-            montly_files.insert(0, tmp_montly_cp_dtfile)
-
-            tmp_counter += 4
-            how_many_monts -= 1
-
-
+exit(1)
 
 
 #################### rotate days ##############################################

@@ -25,6 +25,8 @@ keep_date_days = {}
 how_many_weeks = 0
 how_many_monts = 0
 latest_week = []
+first_year = 0
+last_year = 0
 start_from_scratch = 0
 dir_size = 0
 dir_free = 0
@@ -97,15 +99,39 @@ montly_countmax=len(montly_files)
 
 logwriter("montly backup files: "+str(montly_countmax))
 
-# parse first-last years
-first_day_file = all_daily_files[0].split("/")[-1].split("-")
-last_day_file = all_daily_files[-1].split("/")[-1].split("-")
-first_year = int(first_day_file[0])
-last_year = int(last_day_file[0])
+# get years range
+if all_daily_countmax:
+    # parse first-last years from days files
+    first_day_file = all_daily_files[0].split("/")[-1].split("-")
+    last_day_file = all_daily_files[-1].split("/")[-1].split("-")
+
+    first_day_file = int(first_day_file[0])
+    last_day_file = int(last_day_file[0])
+
+    first_year = first_day_file
+    last_year = last_day_file
+
+if weekly_countmax:
+    # parse first-last years from weekly files
+    first_weekly_file = weekly_files[0].split("/")[-1].split("-")
+    last_weekly_file = weekly_files[-1].split("/")[-1].split("-")
+
+    first_weekly_file = int(first_weekly_file[0])
+    last_weekly_file = int(last_weekly_file[0])
+
+    # extend range
+    if first_weekly_file < first_year:
+        first_year = first_weekly_file
+    if last_weekly_file > last_year:
+        last_year = last_weekly_file
+
 
 # generate at least one year (not empty)
 year_range = list(range(first_year, last_year+1))
 
+if not year_range[0]:
+    logwriter("nothing to do, exit")
+    exit(1)
 
 #################### create weeks #############################################
 

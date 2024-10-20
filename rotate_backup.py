@@ -5,7 +5,7 @@ import os
 import shutil
 from datetime import datetime
 
-# VERSION v2.01
+# VERSION v2.02
 
 KEEP_DAYS = 31
 KEEP_WEEKS = 4
@@ -122,9 +122,11 @@ if weekly_countmax:
     # extend range
     if first_weekly_file < first_year:
         first_year = first_weekly_file
+    elif first_weekly_file > 0:
+        first_year = first_weekly_file
+
     if last_weekly_file > last_year:
         last_year = last_weekly_file
-
 
 # generate at least one year (not empty)
 year_range = list(range(first_year, last_year+1))
@@ -140,7 +142,7 @@ for gen_year in year_range:
     gen_year = str(gen_year)
     # init new year
     daily_array.update({gen_year: []})
-    for gen_month in range(1,13):
+    for _ in range(1,13):
         # init new month
         daily_array[gen_year].append([])
         for gen_day in range(1,32):
@@ -216,7 +218,7 @@ for gen_year in year_range:
     gen_year = str(gen_year)
     # init new year
     weekly_array.update({gen_year: []})
-    for gen_month in range(1,13):
+    for _ in range(1,13):
         # init list of files by weeks
         weekly_array[str(gen_year)].append([])
 

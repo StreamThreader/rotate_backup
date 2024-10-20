@@ -148,11 +148,15 @@ for week_year in daily_array:
             # convert dailly file name to weekly
             week_new_file = daily_file.replace(daily_suffix, weekly_suffix)
 
+            # ignore if empty
+            if daily_file == "empty":
+                continue
+
             # try create new weekly file
             if make_link(daily_file, week_new_file):
                 # add to week list
                 if not week_new_file in weekly_files:
-                    weekly_files.add(week_new_file)
+                    weekly_files.append(week_new_file)
                     weekly_files.sort()
                 continue
             else:
@@ -174,7 +178,7 @@ for week_year in daily_array:
                     if make_link(daily_file, week_new_file):
                         # add to week list
                         if not week_new_file in weekly_files:
-                            weekly_files.add(week_new_file)
+                            weekly_files.append(week_new_file)
                             weekly_files.sort()
                         break
 
@@ -215,7 +219,7 @@ for month_year in weekly_array:
             if make_link(weekly_file, month_new_file):
                 # add to month list
                 if not week_new_file in weekly_files:
-                    montly_files.add(week_new_file)
+                    montly_files.append(week_new_file)
                     montly_files.sort()
                 break
 

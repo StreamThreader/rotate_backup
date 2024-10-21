@@ -1,2 +1,45 @@
 # rotate_backup
-Script for rotate backup files
+
+== EN ==
+
+The script is designed to automate work with backup files.
+Each call performs the following steps:
+
+1) creating weekly backups based on daily backups
+2) creating monthly backups based on weekly backups
+3) rotating daily backups
+4) rotating weekly backups
+
+Usage instructions
+
+The variable "rotate_dir" stores the path to the directory where daily backup copies are regularly placed.
+Backup files match the pattern in the variable "name_pattern".
+By default, the pattern is set to "????-??-??-v8.3-TW-ERP--??-??-".
+The variables "daily_suffix", "weekly_suffix", "montly_suffix" set the endings of the file names.
+As a result, examples:
+* daily backup "2024-01-01-v8.3-TW-ERP--01-00-d.dt"
+* weekly backup "2024-01-01-v8.3-TW-ERP--01-00-w.dt"
+* monthly backup "2024-01-01-v8.3-TW-ERP--01-00-m.dt"
+The variables "KEEP_DAYS" and "KEEP_WEEKS" specify the number of the last daily and weekly files to be kept.
+
+== UK ==
+
+Скрипт призначено для автоматизації роботи з файлами резервних копій.
+Під час кожного виклику виконуються етапи:
+
+1) створення базуючись на денних бекапів - тижневих
+2) створення базуючись на тижневих бекапів - місячних
+3) ротація денних бекапів
+4) ротація тижневих бекапів
+
+Інструкція з використання
+
+У змінній "rotate_dir" зберігатиметься шлях до директорії, куди регулярно розміщуються щоденні резевні копії.
+Файли резервних копій відповідають шаблону змінної "name_pattern".
+За замовчуванням шаблон встановлено "????-??-??-v8.3-TW-ERP--??-??-".
+Змінними "daily_suffix", "weekly_suffix", "montly_suffix" задаються закінчення імені файлів.
+В результаті приклад:
+ * денний бекап "2024-01-01-v8.3-TW-ERP--01-00-d.dt"
+ * тижневий бекап "2024-01-01-v8.3-TW-ERP--01-00-w.dt"
+ * місячний бекап "2024-01-01-v8.3-TW-ERP--01-00-m.dt"
+Змінними "KEEP_DAYS" та "KEEP_WEEKS" задається кількість останніх денних та тижневих файлів, які необхідно зберігати.

@@ -7,7 +7,7 @@ from datetime import datetime
 
 # VERSION v2.02
 
-KEEP_DAYS = 31
+KEEP_DAYS = 3
 KEEP_WEEKS = 4
 rotate_dir = "/home/sthreader/dev/rotate_backup/test_dir/"
 log_file = rotate_dir+"logfile.log"
@@ -42,6 +42,12 @@ def logwriter(message_text):
         logfile.write(dt_string+" "+message_text+"\n")
 
 def make_link(src_file, dst_file):
+    if src_file == "empty":
+        return 0
+
+    if dst_file == "empty":
+        return 0
+
     if not os.path.exists(src_file):
         logwriter("file not exist: "+src_file)
         return 0
@@ -175,10 +181,6 @@ for week_year in daily_array:
             daily_file = daily_array[week_year][week_month][week_day-1][0]
             # convert dailly file name to weekly
             week_new_file = daily_file.replace(daily_suffix, weekly_suffix)
-
-            # ignore if empty
-            if daily_file == "empty":
-                continue
 
             # try create new weekly file
             if make_link(daily_file, week_new_file):

@@ -291,20 +291,26 @@ for day_year in year_range:
 
 #################### rotate weeks #############################################
 
+keep_cntr = KEEP_WEEKS
 
-exit(1)
-# if weekly files more than limit
-if KEEP_WEEKS < weekly_countmax:
-    logwriter("start delete weeks")
+# reversed list
+for rev_year in reversed(year_range):
+    for rev_month in reversed(range(0, 12)):
+        # loop through each weekly file
+        for week_file in reversed(weekly_array[str(rev_year)][rev_month]):
+            # stop loop if reach KEEP_WEEKS end
+            if not keep_cntr:
+                break
 
-    tmp_counter = 0
-    # exclude keep weeks
-    while KEEP_WEEKS > tmp_counter:
-        logwriter("keep weekly file: "+weekly_files[0])
-        del weekly_files[0]
-        tmp_counter += 1
+            # exclude from array (prevent deleting)
+            weekly_array[str(rev_year)][rev_month].remove(week_file)
+            keep_cntr -= 1
 
-    # delete over limit weeks
-    for dt_file in weekly_files:
-        os.remove(dt_file)
-        logwriter("remove weekly file: "+dt_file)
+
+# delete files from list
+for week_year in year_range:
+    for week_month in range(0, 12):
+        for week_file in weekly_array[str(week_year)][week_month]:
+            os.remove(week_file)
+            logwriter("remove weekly file from tail: "+week_file)
+

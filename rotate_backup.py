@@ -251,53 +251,48 @@ for month_year in weekly_array:
                     montly_files.sort()
                 break
 
-exit(1)
-
 
 #################### rotate days ##############################################
 
-# if daily files more than limit
-if KEEP_DAYS < only_daily_countmax:
-    limit_counter = 0
+keep_cntr = KEEP_DAYS
 
-    # for each date in list, before limit
-    for date_compare in range(0, len(keep_date_days)):
+# reversed list
+for rev_year in reversed(year_range):
+    for rev_month in reversed(range(0, 12)):
+        for rev_day in reversed(range(0, 31)):
+            # stop loop if reach KEEP_DAYS end
+            if not keep_cntr:
+                break
 
-        # loop run not endless
-        # run by count files
-        for _ in all_daily_files:
-            # for each daily file
-            for dt_file in all_daily_files:
-                # get date from daily file
-                tmp_dateday = dt_file.split("/")[-1]
-                tmp_dateday = tmp_dateday.split("-")
+            ret_val = 0
+            # loop through each file for day
+            day_file_pointer = 0
+            for day_file in daily_array[str(rev_year)][rev_month][rev_day]:
+                if not day_file == "empty":
+                    # exclude from array (prevent deleting)
+                    daily_array[str(rev_year)][rev_month][rev_day]\
+                        [day_file_pointer] = "empty"
+                    ret_val = 1
+                day_file_pointer += 1
 
-                # compare date with each date in filename
-                if keep_date_days[date_compare]["year"] == tmp_dateday[0]:
-                    if keep_date_days[date_compare]["mont"] == tmp_dateday[1]:
-                        if keep_date_days[date_compare]["day"] == tmp_dateday[2]:
-                            # if we found date for exlude
-                            # remove it from array
-                            all_daily_files.remove(dt_file)
-                            logwriter("keep daily file: "+dt_file)
+            # if current day have at least one file
+            if ret_val:
+                keep_cntr -= 1
 
-                            # break because we shift list
-                            # for restart loop
-                            break
-
-        limit_counter += 1
-        # if we reach limit, break from date list
-        if KEEP_DAYS == limit_counter:
-            break
-
-    # loop trought remain list after exclude
-    for dt_file in all_daily_files:
-        os.remove(dt_file)
-        logwriter("remove daily file: "+dt_file)
+# delete files from list
+for day_year in year_range:
+    for day_month in range(0, 12):
+        for day_day in range(0, 31):
+            for day_file in daily_array[str(day_year)][day_month][day_day]:
+                if not day_file == "empty":
+                    os.remove(day_file)
+                    logwriter("remove daily file from tail: "+day_file)
 
 
 #################### rotate weeks #############################################
 
+
+exit(1)
 # if weekly files more than limit
 if KEEP_WEEKS < weekly_countmax:
     logwriter("start delete weeks")

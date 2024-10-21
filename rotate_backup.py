@@ -7,7 +7,7 @@ from datetime import datetime
 
 # VERSION v2.02
 
-KEEP_DAYS = 3
+KEEP_DAYS = 31
 KEEP_WEEKS = 4
 rotate_dir = "/home/sthreader/dev/rotate_backup/test_dir/"
 log_file = rotate_dir+"logfile.log"

@@ -13,9 +13,13 @@ Each call performs the following steps:
 Usage instructions
 
 The variable "rotate_dir" stores the path to the directory where daily backup copies are regularly placed.
+
 Backup files match the pattern in the variable "name_pattern".
+
 By default, the pattern is set to "????-??-??-v8.3-TW-ERP--??-??-".
+
 The variables "daily_suffix", "weekly_suffix", "montly_suffix" set the endings of the file names.
+
 As a result, examples:
 * daily backup "2024-01-01-v8.3-TW-ERP--01-00-d.dt"
 * weekly backup "2024-01-01-v8.3-TW-ERP--01-00-w.dt"
@@ -36,9 +40,13 @@ The variables "KEEP_DAYS" and "KEEP_WEEKS" specify the number of the last daily 
 Інструкція з використання
 
 У змінній "rotate_dir" зберігатиметься шлях до директорії, куди регулярно розміщуються щоденні резевні копії.
+
 Файли резервних копій відповідають шаблону змінної "name_pattern".
+
 За замовчуванням шаблон встановлено "????-??-??-v8.3-TW-ERP--??-??-".
+
 Змінними "daily_suffix", "weekly_suffix", "montly_suffix" задаються закінчення імені файлів.
+
 В результаті приклад:
  * денний бекап "2024-01-01-v8.3-TW-ERP--01-00-d.dt"
  * тижневий бекап "2024-01-01-v8.3-TW-ERP--01-00-w.dt"

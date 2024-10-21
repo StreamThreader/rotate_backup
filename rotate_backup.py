@@ -5,7 +5,7 @@ import os
 import shutil
 from datetime import datetime
 
-# VERSION v2.02
+# VERSION v2.03
 
 KEEP_DAYS = 31
 KEEP_WEEKS = 4
@@ -18,16 +18,11 @@ montly_suffix = "m.dt"
 all_daily_files = []
 daily_array = {}
 weekly_array = {}
-only_daily_files = []
 weekly_files = []
 montly_files = []
-keep_date_days = {}
-how_many_weeks = 0
-how_many_monts = 0
 latest_week = []
 first_year = 0
 last_year = 0
-start_from_scratch = 0
 dir_size = 0
 dir_free = 0
 

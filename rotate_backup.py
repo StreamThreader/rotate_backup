@@ -50,7 +50,7 @@ def make_link(src_file, dst_file):
     if os.path.exists(dst_file):
         return 1
     else:
-        # create symlink
+        # create hardlink
         os.link(src_file, dst_file)
         logwriter("file created: "+dst_file)
         return 1

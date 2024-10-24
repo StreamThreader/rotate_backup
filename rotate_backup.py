@@ -5,7 +5,7 @@ import os
 import shutil
 from datetime import datetime
 
-# VERSION v2.03
+# VERSION v2.04
 
 KEEP_DAYS = 31
 KEEP_WEEKS = 4
@@ -251,63 +251,66 @@ for month_year in weekly_array:
 
 #################### rotate days ##############################################
 
-keep_cntr = KEEP_DAYS
+# if KEEP_DAYS set to 0, skip deletion
+if KEEP_DAYS:
+    keep_cntr = KEEP_DAYS
 
-# reversed list
-for rev_year in reversed(year_range):
-    for rev_month in reversed(range(0, 12)):
-        for rev_day in reversed(range(0, 31)):
-            # stop loop if reach KEEP_DAYS end
-            if not keep_cntr:
-                break
+    # exclude from list preserved days
+    for rev_year in reversed(year_range):
+        for rev_month in reversed(range(0, 12)):
+            for rev_day in reversed(range(0, 31)):
+                # stop loop if reach KEEP_DAYS end
+                if not keep_cntr:
+                    break
 
-            ret_val = 0
-            # loop through each file for day
-            day_file_pointer = 0
-            for day_file in daily_array[str(rev_year)][rev_month][rev_day]:
-                if not day_file == "empty":
-                    # exclude from array (prevent deleting)
-                    daily_array[str(rev_year)][rev_month][rev_day]\
-                        [day_file_pointer] = "empty"
-                    ret_val = 1
-                day_file_pointer += 1
+                ret_val = 0
+                # loop through each file for day
+                day_file_pointer = 0
+                for day_file in daily_array[str(rev_year)][rev_month][rev_day]:
+                    if not day_file == "empty":
+                        # exclude from array (prevent deleting)
+                        daily_array[str(rev_year)][rev_month][rev_day]\
+                            [day_file_pointer] = "empty"
+                        ret_val = 1
+                    day_file_pointer += 1
 
-            # if current day have at least one file
-            if ret_val:
-                keep_cntr -= 1
+                # if current day have at least one file
+                if ret_val:
+                    keep_cntr -= 1
 
-# delete files from list
-for day_year in year_range:
-    for day_month in range(0, 12):
-        for day_day in range(0, 31):
-            for day_file in daily_array[str(day_year)][day_month][day_day]:
-                if not day_file == "empty":
-                    os.remove(day_file)
-                    logwriter("remove daily file from tail: "+day_file)
+    # delete files from resulted list
+    for day_year in year_range:
+        for day_month in range(0, 12):
+            for day_day in range(0, 31):
+                for day_file in daily_array[str(day_year)][day_month][day_day]:
+                    if not day_file == "empty":
+                        os.remove(day_file)
+                        logwriter("remove daily file from tail: "+day_file)
 
 
 #################### rotate weeks #############################################
 
-keep_cntr = KEEP_WEEKS
+# if KEEP_WEEKS set to 0, skip deletion
+if KEEP_WEEKS:
+    keep_cntr = KEEP_WEEKS
 
-# reversed list
-for rev_year in reversed(year_range):
-    for rev_month in reversed(range(0, 12)):
-        # loop through each weekly file
-        for week_file in reversed(weekly_array[str(rev_year)][rev_month]):
-            # stop loop if reach KEEP_WEEKS end
-            if not keep_cntr:
-                break
+    # exclude from list preserved weeks
+    for rev_year in reversed(year_range):
+        for rev_month in reversed(range(0, 12)):
+            # loop through each weekly file
+            for week_file in reversed(weekly_array[str(rev_year)][rev_month]):
+                # stop loop if reach KEEP_WEEKS end
+                if not keep_cntr:
+                    break
 
-            # exclude from array (prevent deleting)
-            weekly_array[str(rev_year)][rev_month].remove(week_file)
-            keep_cntr -= 1
+                # exclude from array (prevent deleting)
+                weekly_array[str(rev_year)][rev_month].remove(week_file)
+                keep_cntr -= 1
 
-
-# delete files from list
-for week_year in year_range:
-    for week_month in range(0, 12):
-        for week_file in weekly_array[str(week_year)][week_month]:
-            os.remove(week_file)
-            logwriter("remove weekly file from tail: "+week_file)
+    # delete files from resulted list
+    for week_year in year_range:
+        for week_month in range(0, 12):
+            for week_file in weekly_array[str(week_year)][week_month]:
+                os.remove(week_file)
+                logwriter("remove weekly file from tail: "+week_file)
 

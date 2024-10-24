@@ -26,6 +26,7 @@ As a result, examples:
 * monthly backup "2024-01-01-v8.3-TW-ERP--01-00-m.dt"
 
 The variables "KEEP_DAYS" and "KEEP_WEEKS" specify the number of the last daily and weekly files to be kept.
+A value of 0 disables file deletion.
 
 == UK ==
 
@@ -53,3 +54,4 @@ The variables "KEEP_DAYS" and "KEEP_WEEKS" specify the number of the last daily 
  * місячний бекап "2024-01-01-v8.3-TW-ERP--01-00-m.dt"
 
 Змінними "KEEP_DAYS" та "KEEP_WEEKS" задається кількість останніх денних та тижневих файлів, які необхідно зберігати.
+Значення 0, вимикає видалення файлів.

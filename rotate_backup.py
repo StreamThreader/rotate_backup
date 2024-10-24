@@ -123,6 +123,8 @@ if weekly_countmax:
     # extend range
     if first_weekly_file < first_year:
         first_year = first_weekly_file
+    elif first_weekly_file > first_year:
+        first_year = first_year
     elif first_weekly_file > 0:
         first_year = first_weekly_file
 

@@ -3,12 +3,14 @@
 == EN ==
 
 The script is designed to automate work with backup files.
+
 Each call performs the following steps:
 
 1) creating weekly backups based on daily backups
 2) creating monthly backups based on weekly backups
 3) rotating daily backups
 4) rotating weekly backups
+4) rotating monthly backups
 
 Usage instructions
 
@@ -25,18 +27,23 @@ As a result, examples:
 * weekly backup "2024-01-01-v8.3-TW-ERP--01-00-w.dt"
 * monthly backup "2024-01-01-v8.3-TW-ERP--01-00-m.dt"
 
-The variables "KEEP_DAYS" and "KEEP_WEEKS" specify the number of the last daily and weekly files to be kept.
+The variables specify how many:
+KEEP_DAYS - days to be kept
+KEEP_WEEKS -  weeks to be kept
+KEEP_MONTHS - months to be kept
 A value of 0 disables file deletion.
 
 == UK ==
 
 Скрипт призначено для автоматизації роботи з файлами резервних копій.
+
 Під час кожного виклику виконуються етапи:
 
 1) створення базуючись на денних бекапів - тижневих
 2) створення базуючись на тижневих бекапів - місячних
 3) ротація денних бекапів
 4) ротація тижневих бекапів
+5) ротація місячних бекапів
 
 Інструкція з використання
 
@@ -46,12 +53,15 @@ A value of 0 disables file deletion.
 
 За замовчуванням шаблон встановлено "????-??-??-v8.3-TW-ERP--??-??-".
 
-Змінними "daily_suffix", "weekly_suffix", "montly_suffix" задаються закінчення імені файлів.
+Змінними "daily_suffix", "weekly_suffix", "montly_suffix" задаються закінчення імен файлів.
 
 В результаті приклад:
  * денний бекап "2024-01-01-v8.3-TW-ERP--01-00-d.dt"
  * тижневий бекап "2024-01-01-v8.3-TW-ERP--01-00-w.dt"
  * місячний бекап "2024-01-01-v8.3-TW-ERP--01-00-m.dt"
 
-Змінними "KEEP_DAYS" та "KEEP_WEEKS" задається кількість останніх денних та тижневих файлів, які необхідно зберігати.
+Змінними задається скількі зберігати:
+KEEP_DAYS - днів
+KEEP_WEEKS - неділь
+KEEP_MONTHS - місяців
 Значення 0, вимикає видалення файлів.

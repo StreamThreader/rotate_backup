@@ -28,9 +28,11 @@ As a result, examples:
 * monthly backup "2024-01-01-v8.3-TW-ERP--01-00-m.dt"
 
 The variables specify how many:
-KEEP_DAYS - days to be kept
-KEEP_WEEKS -  weeks to be kept
-KEEP_MONTHS - months to be kept
+
+* KEEP_DAYS - days to be kept
+* KEEP_WEEKS -  weeks to be kept
+* KEEP_MONTHS - months to be kept
+
 A value of 0 disables file deletion.
 
 == UK ==
@@ -61,7 +63,9 @@ A value of 0 disables file deletion.
  * місячний бекап "2024-01-01-v8.3-TW-ERP--01-00-m.dt"
 
 Змінними задається скількі зберігати:
-KEEP_DAYS - днів
-KEEP_WEEKS - неділь
-KEEP_MONTHS - місяців
+
+* KEEP_DAYS - днів
+* KEEP_WEEKS - неділь
+* KEEP_MONTHS - місяців
+
 Значення 0, вимикає видалення файлів.
